@@ -1,0 +1,40 @@
+DRAMABOX
+LIST DRAMA SUB INDO TERBARU DAN TERPOPULER
+https://api.sansekai.my.id/api/dramabox/dubindo?classify=terbaru
+https://api.sansekai.my.id/api/dramabox/dubindo?classify=terpopuler
+RANDOM DRAMA
+https://api.sansekai.my.id/api/dramabox/randomdrama
+DRAMA FORYOU
+https://api.sansekai.my.id/api/dramabox/foryou
+DRAMA TERBARU
+https://api.sansekai.my.id/api/dramabox/latest
+DRAMA TRENDING
+https://api.sansekai.my.id/api/dramabox/trending
+PENCARIAN POPULER
+https://api.sansekai.my.id/api/dramabox/populersearch
+CARI DRAMA
+https://api.sansekai.my.id/api/dramabox/search?query=(QUERY PENCARIAN)
+DETAIL DRAMA
+https://api.sansekai.my.id/api/dramabox/detail?bookId=42000002888
+ALL EPISODE
+https://api.sansekai.my.id/api/dramabox/allepisode?bookId=42000002888
+
+MELOLO
+DRAMA TERBARU
+https://api.sansekai.my.id/api/melolo/latest
+TRENDING
+https://api.sansekai.my.id/api/melolo/trending
+SEARCH
+https://api.sansekai.my.id/api/melolo/search?query=(QUERY PENCARIAN)&limit=(INT)&offset=(DEFAULT 0)
+DETAIL DRAMA
+https://api.sansekai.my.id/api/melolo/detail?bookId=
+STREAM DRAMA
+https://api.sansekai.my.id/api/melolo/stream?videoId=
+
+PROMPT FOR GENERATE TITLE
+buatkan saya judul konten youtube
+[TITLE]
+seo optimation
+dan deskripsi
+[SINOPSIS]
+untuk chanel dinasti drama china

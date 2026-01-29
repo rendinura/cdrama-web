@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  @apply transition-colors duration-500;
+}
+
+@layer utilities {
+  .animate-marquee {
+    animation: scroll-marquee 60s linear infinite;
+    display: flex;
+    width: max-content;
+  }
+
+  .animate-marquee:hover {
+    animation-play-state: paused; /* Berhenti saat di-hover */
+  }
+
+  @keyframes scroll-marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+  }
+}
+
+/* Globals.css */
+html.lenis {
+    height: auto;
+  }
+  
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+  
+  /* Sembunyikan Scrollbar tapi tetap bisa scroll */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+@layer components {
+  /* Smooth Gradient Transition */
+  .section-gradient {
+      background: linear-gradient(to bottom, transparent, #1A1A1A);
+  }
+
+  /* Side Drawer Mobile Style */
+  #mobile-menu-container {
+      @apply fixed top-0 bottom-0 bg-white dark:bg-[#0f0f0f] z-[90] w-[55%] max-w-[400px] right-0 translate-x-full transition-transform duration-500 shadow-[-10px_0_30px_rgba(0,0,0,0.1)];
+      transition-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
+  }
+  
+  #mobile-menu-container.active {
+      @apply translate-x-0;
+  }
+
+  /* Nav Link Indicator */
+  .nav-link {
+      @apply relative py-1;
+  }
+  .nav-link::after {
+      content: '';
+      @apply absolute bottom-0 left-0 w-0 h-[2px] bg-red-600 transition-[width] duration-300;
+  }
+  .nav-link.active::after {
+      @apply w-full;
+  }
+
+  /* Perspective Card Effect */
+  .perspective-card {
+      @apply transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)];
+      transform: perspective(1000px) rotateY(0deg);
+  }
+
+  .perspective-card:hover {
+      transform: perspective(1000px) rotateY(-5deg) translateY(-10px);
+  }
+
+  /* Glow Effects */
+  .dark .hover-red-glow:hover {
+      box-shadow: 0 0 50px rgba(239, 68, 68, 0.15);
+  }
+  
+  /* Pastikan backdrop menu juga mendukung dark mode */
+  #menu-backdrop {
+      @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-80 hidden;
+  }
+  #menu-backdrop.active {
+      @apply block;
+  }
+}
+
+@layer utilities {
+  .animate-marquee {
+      animation: scroll-marquee 45s linear infinite;
+  }
+  @keyframes scroll-marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-100%); }
+  }
+}
