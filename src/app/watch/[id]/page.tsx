@@ -34,6 +34,9 @@ export default function WatchPage({ params }: { params: Promise<{ id: string }> 
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [isAutoNext, setIsAutoNext] = useState(true);
+  const [startEpisode, setStartEpisode] = useState(1);
+  const [endEpisode, setEndEpisode] = useState(episodes.length);
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
   const handleNextEpisode = () => {
     if (currentEpIndex < episodes.length - 1) {
@@ -79,6 +82,11 @@ export default function WatchPage({ params }: { params: Promise<{ id: string }> 
   const activeSource = videoSources.find((v: any) => v.quality === currentQuality) || videoSources[0];
 
   const downloadSingle = async (videoUrl: string, fileName: string) => {
+    if (!window.showDirectoryPicker) {
+      alert("Browser Anda tidak mendukung fitur pilih folder (Gunakan Chrome/Edge terbaru).");
+      return;
+    }
+    
     try {
       setIsDownloading(true);
       const response = await fetch(videoUrl);
@@ -102,34 +110,58 @@ export default function WatchPage({ params }: { params: Promise<{ id: string }> 
       alert("Browser Anda tidak mendukung fitur pilih folder (Gunakan Chrome/Edge terbaru).");
       return;
     }
-
+  
     try {
       const directoryHandle = await window.showDirectoryPicker();
       setIsDownloading(true);
       
-      for (let i = 0; i < episodes.length; i++) {
+      const startIdx = Math.max(0, startEpisode - 1);
+      const endIdx = Math.min(episodes.length - 1, endEpisode - 1);
+      const totalInRange = endIdx - startIdx + 1;
+  
+      for (let i = startIdx; i <= endIdx; i++) {
         const ep = episodes[i];
+        const fileName = `${detail.bookName} - ${ep.chapterName}.mp4`;
+        
+        const currentDone = i - startIdx + 1;
+        setDownloadProgress(Math.round((currentDone / totalInRange) * 100));
+  
+        // 1. AUTO DETECTION
+        try {
+          await directoryHandle.getFileHandle(fileName, { create: false });
+          continue; 
+        } catch (err) {
+          // Lanjut download jika file belum ada
+        }
+  
+        // 2. PROSES DOWNLOAD
         const source = ep.cdnList[0]?.videoPathList.find((v: any) => v.quality === currentQuality) || ep.cdnList[0]?.videoPathList[0];
-        
-        setDownloadProgress(Math.round(((i + 1) / episodes.length) * 100));
-
         const proxyUrl = `/api/proxy?url=${encodeURIComponent(source.videoPath)}`;
-        const response = await fetch(proxyUrl);
         
+        const response = await fetch(proxyUrl);
         if (!response.ok) throw new Error(`Gagal mengunduh Episode ${ep.chapterName}`);
         
         const blob = await response.blob();
         
-        const fileHandle = await directoryHandle.getFileHandle(`${detail.bookName} - ${ep.chapterName}.mp4`, { create: true });
+        const fileHandle = await directoryHandle.getFileHandle(fileName, { create: true });
         const writable = await fileHandle.createWritable();
         await writable.write(blob);
         await writable.close();
+  
+        // --- 3. JEDA WAKTU RANDOM (500ms - 5000ms) ---
+        if (i < endIdx) {
+          // Rumus: Math.floor(Math.random() * (max - min + 1)) + min
+          const randomDelay = Math.floor(Math.random() * (5000 - 500 + 1)) + 500;
+          
+          console.log(`Menunggu selama ${randomDelay}ms sebelum episode berikutnya...`);
+          await sleep(randomDelay); 
+        }
       }
       
-      alert("Download Selesai!");
+      alert("Proses Download Selesai!");
     } catch (error) {
       console.error(error);
-      alert("Download dibatalkan atau terjadi kesalahan.");
+      alert("Download terhenti.");
     } finally {
       setIsDownloading(false);
       setDownloadProgress(0);
