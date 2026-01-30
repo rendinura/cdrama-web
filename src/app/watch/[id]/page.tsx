@@ -110,6 +110,11 @@ export default function WatchPage({ params }: { params: Promise<{ id: string }> 
       alert("Browser Anda tidak mendukung fitur pilih folder (Gunakan Chrome/Edge terbaru).");
       return;
     }
+
+    if (isNaN(startEpisode) || isNaN(endEpisode)) {
+      alert("Silakan masukkan nomor episode yang valid.");
+      return;
+    }
   
     try {
       const directoryHandle = await window.showDirectoryPicker();
@@ -148,9 +153,7 @@ export default function WatchPage({ params }: { params: Promise<{ id: string }> 
         await writable.write(blob);
         await writable.close();
   
-        // --- 3. JEDA WAKTU RANDOM (500ms - 5000ms) ---
         if (i < endIdx) {
-          // Rumus: Math.floor(Math.random() * (max - min + 1)) + min
           const randomDelay = Math.floor(Math.random() * (5000 - 500 + 1)) + 500;
           
           console.log(`Menunggu selama ${randomDelay}ms sebelum episode berikutnya...`);
@@ -230,33 +233,60 @@ export default function WatchPage({ params }: { params: Promise<{ id: string }> 
     </button>
   </div>
 
-                    {/* SECTION DOWNLOAD */}
-        <div className="mt-8 bg-[#1a1c22] p-6 rounded-2xl border border-gray-800">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>
-              <h3 className="text-white font-bold text-lg uppercase tracking-wider">Download Area</h3>
-              <p className="text-gray-500 text-xs mt-1 italic">*Bulk download akan menyimpan semua episode dengan kualitas {currentQuality}p</p>
-            </div>
-            
-            <div className="flex gap-3">
-              <button 
-                onClick={() => downloadSingle(activeSource.videoPath, `${detail.bookName} - ${currentEpisode.chapterName}`)}
-                disabled={isDownloading}
-                className="bg-gray-800 hover:bg-gray-700 px-6 py-3 rounded-xl text-xs font-bold transition flex items-center gap-2 border border-gray-700"
-              >
-                {isDownloading ? 'Processing...' : '📥 DOWNLOAD'}
-              </button>
-              
-              <button 
-                onClick={bulkDownload}
-                disabled={isDownloading}
-                className="bg-pink-600 hover:bg-pink-700 px-6 py-3 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-pink-600/20"
-              >
-                {isDownloading ? `DOWNLOADING ${downloadProgress}%` : '🚀 BULK DOWNLOAD'}
-              </button>
-            </div>
-          </div>
-        </div>
+            {/* SECTION DOWNLOAD */}
+            <div className="mt-8 bg-[#1a1c22] p-6 rounded-2xl border border-gray-800">
+              <div className="flex flex-col gap-6">
+                <div>
+                  <h3 className="text-white font-bold text-lg uppercase tracking-wider">Download Area</h3>
+                  <p className="text-gray-500 text-xs mt-1 italic">*Pilih rentang episode jika proses sebelumnya terhenti.</p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4 bg-black/30 p-4 rounded-xl border border-gray-700">
+                  <div className="flex items-center gap-2">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase">Mulai Eps:</label>
+                    <input 
+                      type="number" 
+                      value={isNaN(startEpisode) ? '' : startEpisode} 
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        setStartEpisode(isNaN(val) ? NaN : val);
+                      }}
+                      className="w-16 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-xs focus:border-pink-600 outline-none"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase">Sampai Eps:</label>
+                    <input 
+                      type="number" 
+                      value={isNaN(endEpisode) ? '' : endEpisode} 
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        setEndEpisode(isNaN(val) ? NaN : val);
+                      }}
+                      className="w-16 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-xs focus:border-pink-600 outline-none"
+                    />
+                  </div>
+                  
+                  <div className="flex-1 flex justify-end gap-3">
+                    <button 
+                      onClick={() => downloadSingle(activeSource.videoPath, `${detail.bookName} - ${currentEpisode.chapterName}`)}
+                      disabled={isDownloading}
+                      className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-[10px] font-bold transition border border-gray-700"
+                    >
+                      {isDownloading ? 'Downloading...' : '📥 SINGLE'}
+                    </button>
+                    
+                    <button 
+                      onClick={bulkDownload}
+                      disabled={isDownloading}
+                      className="bg-pink-600 hover:bg-pink-700 px-6 py-2 rounded-lg text-[10px] font-bold transition shadow-lg shadow-pink-600/20"
+                    >
+                      {isDownloading ? `LOGGING ${downloadProgress}%` : '🚀 START BULK'}
+                    </button>
+                  </div>
+                </div>
+                </div>
+              </div>
 
             {/* DETAIL DRAMA */}
             <div className="mt-8 bg-[#1a1c22]/50 p-6 rounded-2xl border border-gray-800">
